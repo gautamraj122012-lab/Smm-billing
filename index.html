@@ -2,248 +2,378 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SMW Billing | Srimaruthamalaijewelsworks</title>
     
     <!-- PWA Settings -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#b8962d">
+    <meta name="theme-color" content="#8d6e63">
 
-    <!-- PDF & Icons -->
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;800&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #b8962d; --dark: #1e293b; --light: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: #e2e8f0; margin: 0; padding: 10px; }
-        
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
-        
-        /* Header */
-        .shop-header { background: var(--dark); color: white; padding: 30px; text-align: center; border-bottom: 5px solid var(--gold); }
-        .shop-header h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 1px; }
-        .shop-header p { margin: 5px 0 0; opacity: 0.8; font-size: 14px; }
+        :root {
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --silver-gradient: linear-gradient(135deg, #707070, #e0e0e0, #808080, #ffffff, #909090);
+            --royal-blue: #1a237e;
+            --deep-gold: #8d6e63;
+        }
 
-        /* Sections */
-        .section { padding: 20px; border-bottom: 1px solid #e2e8f0; }
-        .section-title { font-size: 12px; font-weight: 800; color: var(--gold); text-transform: uppercase; margin-bottom: 15px; display: block; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #fdfcf0; 
+            margin: 0; 
+            padding: 15px;
+            color: #2c3e50;
+        }
+
+        .bill-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border: 2px solid #e0c068;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Royal Header */
+        .header {
+            background: var(--royal-blue);
+            color: white;
+            padding: 35px 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 5px solid #bf953f;
+        }
+
+        .header h1 {
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            font-size: 30px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+        }
+
+        .slogan {
+            font-family: 'Noto Sans Tamil', sans-serif;
+            font-size: 20px;
+            color: #fcf6ba;
+            margin-top: 10px;
+            display: block;
+            font-weight: 700;
+        }
+
+        .header-details {
+            margin-top: 15px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Input Sections */
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--deep-gold);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
         .field { display: flex; flex-direction: column; }
-        label { font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        
+        label { 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
 
-        /* Item Table */
-        .table-wrapper { overflow-x: auto; padding: 10px 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { background: #f1f5f9; padding: 12px; text-align: left; font-size: 12px; color: #475569; border-bottom: 2px solid #cbd5e1; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        input, select {
+            padding: 12px;
+            border: 2px solid #f1f1f1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: 0.3s;
+        }
 
-        /* Summary */
-        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 20px; background: #f8fafc; }
-        .total-box { background: white; padding: 20px; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-        .grand-total { border-top: 2px solid var(--gold); margin-top: 10px; padding-top: 10px; font-weight: 800; font-size: 20px; color: #16a34a; }
+        input:focus { border-color: #bf953f; outline: none; background: #fffdf5; }
+
+        /* Table Design */
+        .table-area { padding: 10px 0; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            text-align: left; 
+            font-size: 12px; 
+            color: var(--royal-blue);
+            border-bottom: 3px solid #bf953f;
+        }
+        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 14px; font-weight: 500; }
+
+        /* Calculation Footer */
+        .summary-wrapper {
+            background: #fdfbf7;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            padding: 25px;
+            gap: 30px;
+        }
+
+        .total-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #bf953f;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
+        
+        .row.grand {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #bf953f;
+            font-weight: 800;
+            font-size: 22px;
+            color: #1b5e20;
+        }
 
         /* Buttons */
-        .actions { padding: 20px; display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-add { background: var(--gold); color: white; }
-        .btn-pdf { background: #ef4444; color: white; }
-        .btn-wa { background: #22c55e; color: white; }
+        .btn-panel { padding: 20px; display: flex; gap: 15px; }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            font-size: 13px;
+        }
 
-        .og-tag { background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .btn-gold { background: var(--gold-gradient); color: #4e342e; border: 1px solid #aa771c; }
+        .btn-silver { background: var(--silver-gradient); color: #333; border: 1px solid #999; }
+        .btn-whatsapp { background: #25d366; color: white; }
 
-        @media print { .no-print { display: none !important; } }
+        @media (max-width: 600px) {
+            .summary-wrapper { grid-template-columns: 1fr; }
+            .header h1 { font-size: 20px; }
+            .slogan { font-size: 16px; }
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; background: white; }
+            .bill-container { border: none; box-shadow: none; width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="bill-area">
-    <!-- SHOP IDENTITY -->
-    <div class="shop-header">
+<div class="bill-container" id="main-bill">
+    <!-- Header with Unique Tamil Slogan -->
+    <div class="header">
         <h1>Srimaruthamalaijewelsworks</h1>
-        <p>நம்பிக்கை நாணயம் கைராசி<br>Phone no:9865739322</p>
-        <p>Madurai, Tamil Nadu | Date: <span id="currentDate"></span></p>
+        <span class="slogan">நம்பிக்கை நாணயம் கைராசி</span>
+        <div class="header-details">
+            916 Hallmark Gold & Silver Merchants<br>
+            Madurai, Tamil Nadu | Date: <span id="bill-date"></span>
+        </div>
     </div>
 
-    <!-- CUSTOMER & RATE -->
+    <!-- Customer Section -->
     <div class="section no-print">
-        <span class="section-title">Customer & Market Rate</span>
-        <div class="grid">
-            <div class="field"><label>Customer Name</label><input type="text" id="custName" placeholder="Name" oninput="sync()"></div>
-            <div class="field"><label>Mobile Number</label><input type="number" id="custMob" placeholder="Phone" oninput="sync()"></div>
-            <div class="field"><label>Today's Gold Rate</label><input type="number" id="goldRate" value="7500" oninput="calculatePreview()"></div>
+        <span class="section-title">Customer Information</span>
+        <div class="grid-inputs">
+            <div class="field"><label>Customer Name</label><input type="text" id="custName" placeholder="Enter Name" oninput="sync()"></div>
+            <div class="field"><label>Contact Number</label><input type="number" id="custMob" placeholder="Phone" oninput="sync()"></div>
+            <div class="field"><label>Today's Gold Rate</label><input type="number" id="rate22k" value="7500" oninput="recalculate()"></div>
         </div>
     </div>
 
-    <!-- ITEM INPUT -->
-    <div class="section no-print" style="background: #fffdf5;">
-        <span class="section-title">New Item Details</span>
-        <div class="grid">
-            <div class="field"><label>Item Name</label><input type="text" id="itemName" placeholder="Chain / Ring"></div>
-            <div class="field"><label>Gross Weight (g)</label><input type="number" id="itemWt" step="0.001"></div>
-            <div class="field"><label>Wastage % (VA)</label><input type="number" id="itemWaste" step="0.1"></div>
-            <div class="field"><label>Stone Charges (₹)</label><input type="number" id="itemStone" value="0"></div>
-            <div class="field"><label>Hallmark / HUID (₹)</label><input type="number" id="itemHM" value="50"></div>
-            <div class="field"><label>Making Charges (₹)</label><input type="number" id="itemMC" value="0"></div>
+    <!-- Multi-Item Entry -->
+    <div class="section no-print" style="background: #fdfdfd;">
+        <span class="section-title">Purchase Item (Gold/Silver)</span>
+        <div class="grid-inputs">
+            <div class="field">
+                <label>Category</label>
+                <select id="itemType">
+                    <option value="Gold">GOLD (தங்கம்)</option>
+                    <option value="Silver">SILVER (வெள்ளி)</option>
+                </select>
+            </div>
+            <div class="field"><label>Item Name</label><input type="text" id="itemName" placeholder="E.g. Chain"></div>
+            <div class="field"><label>Weight (g)</label><input type="number" id="itemWt" step="0.001"></div>
+            <div class="field"><label>Wastage (VA %)</label><input type="number" id="itemVA" value="12"></div>
+            <div class="field"><label>HUID/Stone/MC (₹)</label><input type="number" id="itemOther" value="0"></div>
         </div>
-        <button class="btn btn-add" style="margin-top: 15px; width: 100%;" onclick="addItem()">+ Add Item to Bill</button>
+        <button class="btn btn-gold" style="margin-top:15px; width: 100%;" onclick="addItem()">+ Add Item to Bill</button>
     </div>
 
-    <!-- BILL TABLE -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Item Description</th>
-                    <th>Weight</th>
-                    <th>VA %</th>
-                    <th>Net Wt</th>
-                    <th>Charges</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="billItems">
-                <!-- Items Added Here -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- OLD GOLD EXCHANGE -->
-    <div class="section no-print" style="background: #f0fdf4;">
-        <span class="section-title">Old Gold Exchange (Deduction)</span>
-        <div class="grid">
-            <div class="field"><label>Old Gold Wt (g)</label><input type="number" id="ogWt" placeholder="0.000" oninput="calcOG()"></div>
-            <div class="field"><label>Melting/Less (g)</label><input type="number" id="ogMelt" value="0" oninput="calcOG()"></div>
-            <div class="field"><label>Touch %</label><input type="number" id="ogTouch" value="92" oninput="calcOG()"></div>
-            <div class="field"><label>Buying Rate (₹)</label><input type="number" id="ogRate" placeholder="Rate" oninput="calcOG()"></div>
+    <!-- Bill Table -->
+    <div class="section">
+        <div class="table-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ITEM DETAILS</th>
+                        <th>WEIGHT</th>
+                        <th>VA %</th>
+                        <th>NET WT</th>
+                        <th>TOTAL (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="billBody">
+                    <!-- Items Added Here -->
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- SUMMARY -->
-    <div class="footer-grid">
-        <div class="customer-info">
-            <span class="section-title">Invoiced To</span>
-            <p><strong>Name:</strong> <span id="outName">...</span></p>
-            <p><strong>Phone:</strong> <span id="outMob">...</span></p>
-            <p style="font-size: 11px; color: #64748b; margin-top: 20px;">* This is a computer generated estimate for Srimaruthamalaijewelsworks.</p>
+    <!-- Calculations Section -->
+    <div class="summary-wrapper">
+        <div>
+            <span class="section-title">Adjustments</span>
+            <div class="no-print grid-inputs" style="grid-template-columns: 1fr 1fr;">
+                <div class="field"><label>Old Gold Wt</label><input type="number" id="ogWt" value="0" oninput="recalculate()"></div>
+                <div class="field"><label>OG Rate</label><input type="number" id="ogRate" value="0" oninput="recalculate()"></div>
+            </div>
+            <div style="margin-top: 15px; font-size: 14px;">
+                <p><strong>Customer:</strong> <span id="dispName">...</span></p>
+                <p><strong>Contact:</strong> <span id="dispMob">...</span></p>
+            </div>
         </div>
-        <div class="total-box">
-            <div class="row"><span>Sub-Total:</span> <span>₹ <span id="subTotal">0</span></span></div>
-            <div class="row" style="color: #ef4444;"><span>Old Gold Value:</span> <span>- ₹ <span id="ogTotal">0</span></span></div>
-            <div class="row"><span>CGST/SGST (3%):</span> <span>₹ <span id="taxTotal">0</span></span></div>
-            <div class="row"><span>Adjustment:</span> <input type="number" id="adj" value="0" oninput="finalCalc()" style="width: 60px; text-align: right; border: none; font-weight: bold;"></div>
-            <div class="row grand-total">
-                <span>NET PAYABLE</span>
+        
+        <div class="total-card">
+            <div class="row"><span>Total Amount:</span> <span>₹ <span id="totalAmt">0</span></span></div>
+            <div class="row" style="color: #c62828;"><span>Old Gold Exchange:</span> <span>- ₹ <span id="ogValue">0</span></span></div>
+            <div class="row" style="color: #1565c0; font-weight: bold;">
+                <span>Advance Paid:</span> 
+                <span>₹ <input type="number" id="advPay" value="0" oninput="recalculate()" style="width: 80px; text-align: right; border: none; background: transparent; font-weight: bold; color: #1565c0; font-size: 15px;"></span>
+            </div>
+            <div class="row grand">
+                <span>NET BALANCE</span>
                 <span>₹ <span id="grandTotal">0</span></span>
             </div>
         </div>
     </div>
 
-    <!-- ACTIONS -->
-    <div class="actions no-print">
-        <button class="btn btn-pdf" onclick="saveAsPDF()">Download PDF</button>
-        <button class="btn btn-wa" onclick="shareWhatsApp()">WhatsApp Bill</button>
+    <!-- Actions -->
+    <div class="btn-panel no-print">
+        <button class="btn btn-silver" onclick="downloadPDF()">Download PDF Bill</button>
+        <button class="btn btn-whatsapp" onclick="shareWA()">WhatsApp Bill</button>
     </div>
 </div>
 
 <script>
     let billItems = [];
-    let ogValue = 0;
-
-    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-IN');
+    document.getElementById('bill-date').innerText = new Date().toLocaleDateString('en-IN', {day: '2-digit', month: 'long', year: 'numeric'});
 
     function sync() {
-        document.getElementById('outName').innerText = document.getElementById('custName').value || "...";
-        document.getElementById('outMob').innerText = document.getElementById('custMob').value || "...";
+        document.getElementById('dispName').innerText = document.getElementById('custName').value || "...";
+        document.getElementById('dispMob').innerText = document.getElementById('custMob').value || "...";
     }
 
     function addItem() {
+        const type = document.getElementById('itemType').value;
         const name = document.getElementById('itemName').value;
         const wt = parseFloat(document.getElementById('itemWt').value || 0);
-        const waste = parseFloat(document.getElementById('itemWaste').value || 0);
-        const stone = parseFloat(document.getElementById('itemStone').value || 0);
-        const hm = parseFloat(document.getElementById('itemHM').value || 0);
-        const mc = parseFloat(document.getElementById('itemMC').value || 0);
-        const rate = parseFloat(document.getElementById('goldRate').value || 0);
+        const va = parseFloat(document.getElementById('itemVA').value || 0);
+        const other = parseFloat(document.getElementById('itemOther').value || 0);
+        const rate = parseFloat(document.getElementById('rate22k').value || 0);
 
         if (!name || wt <= 0) return;
 
-        const wasteGrams = (wt * waste) / 100;
-        const netWt = wt + wasteGrams;
-        const itemTotal = (netWt * rate) + stone + hm + mc;
+        const netWt = wt + (wt * va / 100);
+        const total = (netWt * rate) + other;
 
-        billItems.push({ name, wt, waste, netWt, charges: stone + hm + mc, total: itemTotal });
-        updateTable();
+        billItems.push({ type, name, wt, va, netWt, total });
+        recalculate();
         
-        // Clear
-        document.getElementById('itemName').value = '';
-        document.getElementById('itemWt').value = '';
+        // Clear inputs
+        document.getElementById('itemName').value = "";
+        document.getElementById('itemWt').value = "";
     }
 
-    function updateTable() {
-        const tbody = document.getElementById('billItems');
+    function recalculate() {
+        const tbody = document.getElementById('billBody');
         tbody.innerHTML = "";
         let sub = 0;
 
-        billItems.forEach((item, index) => {
-            sub += item.total;
+        billItems.forEach(it => {
+            sub += it.total;
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${item.name}</strong></td>
-                    <td>${item.wt.toFixed(3)}g</td>
-                    <td>${item.waste}%</td>
-                    <td>${item.netWt.toFixed(3)}g</td>
-                    <td>₹${item.charges.toLocaleString()}</td>
-                    <td><strong>₹${item.total.toLocaleString('en-IN')}</strong></td>
+                    <td><strong>${it.name}</strong><br><small style="color:#777">${it.type}</small></td>
+                    <td>${it.wt.toFixed(3)}g</td>
+                    <td>${it.va}%</td>
+                    <td>${it.netWt.toFixed(3)}g</td>
+                    <td>₹${Math.round(it.total).toLocaleString('en-IN')}</td>
                 </tr>
             `;
         });
-        document.getElementById('subTotal').innerText = sub.toLocaleString('en-IN');
-        finalCalc();
+
+        const ogWt = parseFloat(document.getElementById('ogWt').value || 0);
+        const ogRate = parseFloat(document.getElementById('ogRate').value || 0);
+        const ogVal = ogWt * ogRate;
+        const adv = parseFloat(document.getElementById('advPay').value || 0);
+        
+        const final = sub - ogVal - adv;
+
+        document.getElementById('totalAmt').innerText = Math.round(sub).toLocaleString('en-IN');
+        document.getElementById('ogValue').innerText = Math.round(ogVal).toLocaleString('en-IN');
+        document.getElementById('grandTotal').innerText = Math.round(final).toLocaleString('en-IN');
     }
 
-    function calcOG() {
-        const wt = parseFloat(document.getElementById('ogWt').value || 0);
-        const melt = parseFloat(document.getElementById('ogMelt').value || 0);
-        const touch = parseFloat(document.getElementById('ogTouch').value || 0);
-        const rate = parseFloat(document.getElementById('ogRate').value || 0);
-
-        ogValue = (wt - melt) * (touch / 100) * rate;
-        document.getElementById('ogTotal').innerText = ogValue.toLocaleString('en-IN');
-        finalCalc();
-    }
-
-    function finalCalc() {
-        const sub = billItems.reduce((s, i) => s + i.total, 0);
-        const tax = (sub - ogValue) * 0.03;
-        const adj = parseFloat(document.getElementById('adj').value || 0);
-        const grand = (sub - ogValue) + tax + adj;
-
-        document.getElementById('taxTotal').innerText = tax.toFixed(2);
-        document.getElementById('grandTotal').innerText = Math.round(grand).toLocaleString('en-IN');
-    }
-
-    function saveAsPDF() {
-        const element = document.getElementById('bill-area');
+    function downloadPDF() {
+        const element = document.getElementById('main-bill');
         const name = document.getElementById('custName').value || "Customer";
         const opt = {
-            margin: 5,
+            margin: 0,
             filename: `SMW_Bill_${name}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(element).save();
     }
 
-    function shareWhatsApp() {
-        const name = document.getElementById('custName').value || "Customer";
+    function shareWA() {
         const phone = document.getElementById('custMob').value;
+        const name = document.getElementById('custName').value || "Customer";
         const total = document.getElementById('grandTotal').innerText;
-        const text = `*Srimaruthamalaijewelsworks*%0A---------------------------%0AHi ${name}, your bill total is ₹${total}.%0AThank you for shopping with us!`;
+        const text = `*Srimaruthamalaijewelsworks*%0A_நம்பிக்கை நாணயம் கைராசி_%0A%0AHi ${name}, your bill total is ₹${total}.%0AThank you for your visit!`;
         window.open(`https://wa.me/91${phone}?text=${text}`, '_blank');
     }
 </script>
