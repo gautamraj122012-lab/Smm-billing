@@ -3,293 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice | Srimaruthamalaijewelsworks</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
-    
+    <title>Gleam & Gold - Jewelry Billing System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --royal-blue: #0a1931;
-            --gold-primary: #b38728;
-            --gold-light: #fcf6ba;
-        }
-
-        body { font-family: 'Inter', sans-serif; background: #eee; margin: 0; padding: 10px; color: #333; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
         
-        /* The Printed Bill Look */
-        .invoice-box {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            min-height: 1000px;
-            display: flex;
-            flex-direction: column;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
         }
-
-        /* Top Header Area */
-        .bill-header {
-            text-align: center;
-            border-bottom: 2px solid var(--gold-primary);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+        .luxury-font {
+            font-family: 'Playfair Display', serif;
         }
-
-        .shop-name {
-            font-family: 'Cinzel', serif;
-            font-size: 28px;
-            color: var(--royal-blue);
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .input-focus:focus {
+            outline: none;
+            border-color: #b45309;
+            box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.2);
         }
-
-        .tamil-slogan {
-            font-family: 'Noto Sans Tamil', sans-serif;
-            font-size: 22px;
-            color: var(--gold-primary);
-            display: block;
-            margin-top: 5px;
-            font-weight: 700;
-        }
-
-        .shop-info { font-size: 12px; margin-top: 10px; line-height: 1.5; color: #555; }
-
-        /* Customer & Date Details */
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .cust-details p, .bill-meta p { margin: 5px 0; }
-        .bill-meta { text-align: right; }
-        .label { font-weight: 700; color: #666; width: 100px; display: inline-block; }
-
-        /* The Item Table */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { 
-            background: #f4f4f4; 
-            border-top: 1px solid #ddd; 
-            border-bottom: 2px solid var(--gold-primary);
-            padding: 12px; 
-            text-align: left; 
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
-
-        /* Total Section */
-        .footer-area {
-            margin-top: auto;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 40px;
-        }
-
-        .summary-box {
-            border-top: 2px solid #333;
-            padding-top: 10px;
-        }
-
-        .sum-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
-        .sum-row.grand-total {
-            background: #f9f9f9;
-            padding: 15px 10px;
-            font-weight: 800;
-            font-size: 20px;
-            border-bottom: 2px solid #333;
-        }
-
-        /* Input Controls (Hidden on Print) */
-        .controls {
-            max-width: 800px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .btn-group { max-width: 800px; margin: 10px auto; display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        .btn-add { background: var(--royal-blue); color: white; }
-        .btn-print { background: var(--gold-primary); color: white; }
-
         @media print {
-            body { background: white; padding: 0; }
-            .controls, .btn-group { display: none !important; }
-            .invoice-box { box-shadow: none; border: none; width: 100%; padding: 0; }
+            .no-print { display: none; }
+            .print-only { display: block !important; }
+            body { background: white; margin: 0; padding: 0; }
+            .max-w-4xl { max-width: 100% !important; border: none; box-shadow: none; }
+            .p-4, .p-8 { padding: 0 !important; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body>
-
-<!-- INPUT SECTION -->
-<div class="controls no-print">
-    <div style="grid-column: 1/-1; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 5px;">BILLING CONTROLS</div>
-    <input type="text" id="inName" placeholder="Customer Name" oninput="sync()">
-    <input type="number" id="inMob" placeholder="Phone Number" oninput="sync()">
-    <input type="date" id="inDate" oninput="sync()">
-    <select id="inCaret" onchange="sync()">
-        <option value="22K (91.6)">22K Gold</option>
-        <option value="24K (99.9)">24K Gold</option>
-        <option value="18K (75.0)">18K Gold</option>
-        <option value="Silver">Silver</option>
-    </select>
-    <input type="number" id="inRate" placeholder="Today's Rate" value="7500" oninput="sync()">
-    <hr style="grid-column: 1/-1; width: 100%;">
-    <input type="text" id="itemName" placeholder="Item Name">
-    <input type="number" id="itemWt" placeholder="Weight (g)">
-    <input type="number" id="itemVA" placeholder="VA (%)" value="12">
-    <input type="number" id="itemMC" placeholder="Making Charge" value="0">
-    <input type="text" id="itemHUID" placeholder="Hallmark No.">
-    <button class="btn btn-add" style="grid-column: 1/-1;" onclick="addItem()">+ ADD ITEM TO BILL</button>
-</div>
-
-<!-- ACTUAL INVOICE -->
-<div class="invoice-box" id="bill-print-area">
-    <div class="bill-header">
-        <h1 class="shop-name">Srimaruthamalaijewelsworks</h1>
-        <span class="tamil-slogan">நம்பிக்கை நாணயம் கைராசி</span>
-        <div class="shop-info">
-            Gold & Silver Merchants | Hallmark Showroom<br>
-            Madurai, Tamil Nadu. Mobile: 9XXXXXXXXX
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-amber-100">
+        <!-- Header -->
+        <div class="bg-amber-900 p-6 text-white text-center no-print">
+            <h1 class="luxury-font text-3xl md:text-4xl">Gleam & Gold Artisans</h1>
+            <p class="text-amber-200 text-sm mt-1 uppercase tracking-widest">Premium Jewelry Billing Portal</p>
         </div>
-    </div>
 
-    <div class="details-grid">
-        <div class="cust-details">
-            <p><span class="label">Customer:</span> <span id="outName">________________</span></p>
-            <p><span class="label">Contact:</span> <span id="outMob">________________</span></p>
-        </div>
-        <div class="bill-meta">
-            <p><span class="label">Date:</span> <span id="outDate"></span></p>
-            <p><span class="label">Gold Rate:</span> ₹<span id="outRate">7500</span> (<span id="outCaret">22K</span>)</p>
-        </div>
-    </div>
+        <form id="billingForm" class="p-6 space-y-8 no-print">
+            <!-- Section 1: Customer Info -->
+            <div>
+                <h2 class="text-lg font-semibold text-amber-900 border-b border-amber-100 pb-2 mb-4">
+                    <i class="fas fa-user-circle mr-2"></i>Customer Details
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Date</label>
+                        <input type="date" id="billDate" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Customer Name</label>
+                        <input type="text" id="custName" placeholder="Full Name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Contact Number</label>
+                        <div class="flex mt-1">
+                            <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">+91</span>
+                            <input type="tel" id="custContact" pattern="[0-9]{10}" placeholder="9876543210" required class="w-full p-2 border border-gray-300 rounded-r-lg input-focus">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Item Description / HUID</th>
-                <th>Weight</th>
-                <th>VA %</th>
-                <th>M.Charge</th>
-                <th style="text-align: right;">Total (₹)</th>
-            </tr>
-        </thead>
-        <tbody id="billBody">
-            <!-- Items will appear here -->
-        </tbody>
-    </table>
+            <!-- Section 2: New Gold Details -->
+            <div>
+                <h2 class="text-lg font-semibold text-amber-900 border-b border-amber-100 pb-2 mb-4">
+                    <i class="fas fa-gem mr-2"></i>New Purchase Details
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Item Name</label>
+                        <input type="text" id="itemName" placeholder="Gold Necklace" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Purity (Karat)</label>
+                        <select id="purity" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="24K (99.9%)">24K (99.9%)</option>
+                            <option value="22K (91.6%)" selected>22K (91.6%)</option>
+                            <option value="18K (75%)">18K (75%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Weight (grams)</label>
+                        <input type="number" id="weight" step="0.001" placeholder="0.000" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Rate (per gram ₹)</label>
+                        <input type="number" id="rate" step="0.01" placeholder="0.00" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Wastage (%)</label>
+                        <input type="number" id="wastage" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Making Charge (₹)</label>
+                        <input type="number" id="makingCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Stone Charge (₹)</label>
+                        <input type="number" id="stoneCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Hallmark Charge (₹)</label>
+                        <input type="number" id="hallmarkCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Advance Paid (₹)</label>
+                        <input type="number" id="advancePaid" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                </div>
+            </div>
 
-    <div class="footer-area">
-        <div class="terms">
-            <p style="font-size: 11px; color: #777;">
-                <strong>Terms & Conditions:</strong><br>
-                1. Goods once sold cannot be taken back.<br>
-                2. Subject to Madurai Jurisdiction.<br>
-                3. We guarantee the purity of Hallmark jewelry.
-            </p>
-            <div style="margin-top: 50px; border-top: 1px solid #ccc; width: 150px; text-align: center; font-size: 12px;">
-                Authorized Signature
+            <!-- Section 3: Old Gold Exchange -->
+            <div class="bg-amber-50 p-6 rounded-xl border border-amber-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-amber-900">
+                        <i class="fas fa-exchange-alt mr-2"></i>Old Gold Exchange?
+                    </h2>
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <button type="button" id="oldGoldYes" onclick="toggleOldGold(true)" class="px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-l-lg hover:bg-amber-100">Yes</button>
+                        <button type="button" id="oldGoldNo" onclick="toggleOldGold(false)" class="px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg hover:bg-amber-800">No</button>
+                    </div>
+                </div>
+
+                <div id="oldGoldSection" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Weight (g)</label>
+                        <input type="number" id="oldWeight" step="0.001" placeholder="0.000" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Rate (per gram ₹)</label>
+                        <input type="number" id="oldRate" step="0.01" placeholder="0.00" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Touch/Purity (%)</label>
+                        <input type="number" id="oldPurity" step="0.01" value="100" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Wastage (g)</label>
+                        <input type="number" id="oldWastage" step="0.001" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col md:flex-row gap-4 pt-4">
+                <button type="button" onclick="calculateBill()" class="flex-1 bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 transition shadow-lg text-lg">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i>Generate Bill
+                </button>
+                <button type="reset" onclick="document.getElementById('billResult').classList.add('hidden')" class="px-6 py-4 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50">
+                    Reset
+                </button>
+            </div>
+        </form>
+
+        <!-- Bill Result Modal -->
+        <div id="billResult" class="hidden p-6 border-t border-gray-100 bg-gray-50">
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-300" id="printArea">
+                <div class="text-center mb-8">
+                    <h1 class="luxury-font text-3xl text-amber-900">GLEAM & GOLD ARTISANS</h1>
+                    <p class="text-xs uppercase tracking-widest text-gray-500">Fine Jewelry & Craftsmanship</p>
+                    <div class="h-1 w-20 bg-amber-600 mx-auto mt-2"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 mb-8 text-sm">
+                    <div>
+                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Customer Details</h4>
+                        <p class="text-lg font-semibold text-gray-800" id="dispCustName"></p>
+                        <p class="text-gray-600" id="dispCustContact"></p>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Invoice Info</h4>
+                        <p class="text-gray-800 font-medium" id="dispDate"></p>
+                        <p class="text-gray-500">Invoice No: #INV-2025</p>
+                    </div>
+                </div>
+
+                <table class="w-full mb-8">
+                    <thead>
+                        <tr class="border-b-2 border-amber-900 text-left text-xs uppercase text-amber-900">
+                            <th class="py-2">Description</th>
+                            <th class="py-2 text-right">Details</th>
+                            <th class="py-2 text-right">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b">
+                            <td class="py-3">
+                                <p class="font-bold" id="dispItem"></p>
+                                <p class="text-xs text-gray-500" id="dispPurity"></p>
+                            </td>
+                            <td class="py-3 text-right">
+                                <span id="dispWeight"></span>g @ <span id="dispRate"></span>/g
+                            </td>
+                            <td class="py-3 text-right" id="resGoldBase"></td>
+                        </tr>
+                        <tr class="border-b text-gray-600">
+                            <td class="py-2">Wastage Charges</td>
+                            <td class="py-2 text-right" id="dispWastagePercent"></td>
+                            <td class="py-2 text-right font-medium" id="resWastageRupees"></td>
+                        </tr>
+                        <tr class="border-b text-gray-600">
+                            <td class="py-2">Making Charges</td>
+                            <td class="py-2 text-right">Service</td>
+                            <td class="py-2 text-right" id="resMaking"></td>
+                        </tr>
+                        <tr class="border-b text-gray-600">
+                            <td class="py-2">Stone & Hallmark Charges</td>
+                            <td class="py-2 text-right">Add-ons</td>
+                            <td class="py-2 text-right" id="resOtherCharges"></td>
+                        </tr>
+                        <tr id="oldGoldRow" class="border-b text-red-600 font-medium hidden">
+                            <td class="py-3 italic">Old Gold Exchange Deduction</td>
+                            <td class="py-3 text-right text-xs" id="dispOldDetails"></td>
+                            <td class="py-3 text-right" id="resOldDeduction"></td>
+                        </tr>
+                        <tr class="text-blue-600 font-medium">
+                            <td class="py-3">Advance Paid</td>
+                            <td class="py-3 text-right">Deduction</td>
+                            <td class="py-3 text-right" id="resAdvance"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="flex justify-end">
+                    <div class="w-full md:w-1/2 space-y-2">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Sub Total</span>
+                            <span id="resSubTotal"></span>
+                        </div>
+                        <div class="flex justify-between text-xl font-bold text-amber-900 border-t pt-2">
+                            <span>Grand Total</span>
+                            <span id="resFinalTotal"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center text-[10px] text-gray-400 uppercase tracking-widest no-print">
+                    <p>Thank you for choosing Gleam & Gold Artisans</p>
+                    <button onclick="window.print()" class="mt-4 bg-amber-900 text-white px-10 py-3 rounded-xl hover:bg-black transition flex items-center mx-auto">
+                        <i class="fas fa-print mr-2"></i>Download / Print Invoice
+                    </button>
+                </div>
+                
+                <div class="mt-12 text-center text-[10px] text-gray-400 hidden print-only">
+                    <p>Computer generated invoice. No signature required.</p>
+                </div>
             </div>
         </div>
-        
-        <div class="summary-box">
-            <div class="sum-row"><span>Gross Total:</span> <span id="subTotal">0.00</span></div>
-            <div class="sum-row" style="color: #c00;"><span>Old Gold Exchange:</span> <span id="ogValue">0.00</span></div>
-            <div class="sum-row"><span>Advance Payment:</span> <span id="advValue">0.00</span></div>
-            <div class="sum-row grand-total">
-                <span>NET PAYABLE</span>
-                <span>₹ <span id="grandTotal">0</span></span>
-            </div>
-        </div>
     </div>
-</div>
 
-<!-- BOTTOM ACTIONS -->
-<div class="btn-group no-print">
-    <input type="number" id="inOG" placeholder="Old Gold Value" style="padding:10px; border:1px solid #ddd; border-radius:5px;" oninput="sync()">
-    <input type="number" id="inAdv" placeholder="Advance Paid" style="padding:10px; border:1px solid #ddd; border-radius:5px;" oninput="sync()">
-    <button class="btn btn-print" onclick="window.print()">PRINT INVOICE</button>
-</div>
+    <script>
+        document.getElementById('billDate').valueAsDate = new Date();
+        let hasOldGold = false;
 
-<script>
-    let items = [];
-    document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
+        function toggleOldGold(value) {
+            hasOldGold = value;
+            const section = document.getElementById('oldGoldSection');
+            const yesBtn = document.getElementById('oldGoldYes');
+            const noBtn = document.getElementById('oldGoldNo');
 
-    function sync() {
-        document.getElementById('outName').innerText = document.getElementById('inName').value || "________________";
-        document.getElementById('outMob').innerText = document.getElementById('inMob').value || "________________";
-        document.getElementById('outDate').innerText = document.getElementById('inDate').value;
-        document.getElementById('outRate').innerText = document.getElementById('inRate').value;
-        document.getElementById('outCaret').innerText = document.getElementById('inCaret').value;
-        
-        recalculate();
-    }
+            if (value) {
+                section.classList.remove('hidden');
+                yesBtn.className = "px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-l-lg";
+                noBtn.className = "px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-r-lg hover:bg-amber-100";
+            } else {
+                section.classList.add('hidden');
+                noBtn.className = "px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg";
+                yesBtn.className = "px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-l-lg hover:bg-amber-100";
+            }
+        }
 
-    function addItem() {
-        const name = document.getElementById('itemName').value;
-        const huid = document.getElementById('itemHUID').value || "-";
-        const wt = parseFloat(document.getElementById('itemWt').value || 0);
-        const va = parseFloat(document.getElementById('itemVA').value || 0);
-        const mc = parseFloat(document.getElementById('itemMC').value || 0);
-        const rate = parseFloat(document.getElementById('inRate').value || 0);
+        function formatInr(val) {
+            return "₹" + parseFloat(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
 
-        if (!name || wt <= 0) return;
+        function calculateBill() {
+            const form = document.getElementById('billingForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-        const total = ((wt + (wt * va / 100)) * rate) + mc;
+            // Inputs
+            const weight = parseFloat(document.getElementById('weight').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const wastagePercent = parseFloat(document.getElementById('wastage').value);
+            const making = parseFloat(document.getElementById('makingCharge').value) || 0;
+            const stone = parseFloat(document.getElementById('stoneCharge').value) || 0;
+            const hallmark = parseFloat(document.getElementById('hallmarkCharge').value) || 0;
+            const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
 
-        items.push({ name, huid, wt, va, mc, total });
-        
-        // Clear inputs
-        document.getElementById('itemName').value = "";
-        document.getElementById('itemWt').value = "";
-        document.getElementById('itemHUID').value = "";
-        
-        recalculate();
-    }
+            // New Gold Logic
+            const goldBaseValue = weight * rate;
+            const wastageValue = goldBaseValue * (wastagePercent / 100);
+            const subTotal = goldBaseValue + wastageValue + making + stone + hallmark;
 
-    function recalculate() {
-        const tbody = document.getElementById('billBody');
-        tbody.innerHTML = "";
-        let gross = 0;
+            // Old Gold Logic
+            let oldDeduction = 0;
+            if (hasOldGold) {
+                const oldW = parseFloat(document.getElementById('oldWeight').value) || 0;
+                const oldR = parseFloat(document.getElementById('oldRate').value) || 0;
+                const oldT = parseFloat(document.getElementById('oldPurity').value) / 100 || 1;
+                const oldWas = parseFloat(document.getElementById('oldWastage').value) || 0;
+                
+                oldDeduction = (oldW - oldWas) * oldR * oldT;
+                document.getElementById('oldGoldRow').classList.remove('hidden');
+                document.getElementById('dispOldDetails').innerText = `${oldW}g - ${oldWas}g @ ${oldR}/g (${(oldT*100).toFixed(0)}% Touch)`;
+            } else {
+                document.getElementById('oldGoldRow').classList.add('hidden');
+            }
 
-        items.forEach((it, index) => {
-            gross += it.total;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td><strong>${it.name}</strong><br><small>HUID: ${it.huid}</small></td>
-                    <td>${it.wt.toFixed(3)}g</td>
-                    <td>${it.va}%</td>
-                    <td>₹${it.mc}</td>
-                    <td style="text-align: right;">${Math.round(it.total).toLocaleString()}</td>
-                </tr>
-            `;
-        });
+            const finalTotal = subTotal - oldDeduction - advance;
 
-        const og = parseFloat(document.getElementById('inOG').value || 0);
-        const adv = parseFloat(document.getElementById('inAdv').value || 0);
-        const final = gross - og - adv;
-
-        document.getElementById('subTotal').innerText = Math.round(gross).toLocaleString();
-        document.getElementById('ogValue').innerText = Math.round(og).toLocaleString();
-        document.getElementById('advValue').innerText = Math.round(adv).toLocaleString();
-        document.getElementById('grandTotal').innerText = Math.round(final).toLocaleString();
-    }
-
-    window.onload = sync;
-</script>
-
-</body>
-</html>
-
+            // Populate Bill
+            document.getElementById('dispDate').innerText = "Date: " + document.getElementById('billDate').value;
+            document.getElementById('dispCustName').innerText = document.getElementById('custName').value;
+            document.getElementById('dispCustContact').innerText = "+91 " + document.getElementById('custContact').value;
+            
+            document.getElementById('dispItem').innerText = document.getElementById('itemName').value;
+            document.getElementById('dispPurity').innerText = "Purity: " + document.getElementById('purity').value;
+            document.getElementById('dispWeight').innerText = weight.toFixed(3);
+            document.getElementById('dispRate').innerText = rate.toFixed(2);
+            
+            document.getElementById('resGoldBase').innerText = formatInr(goldBaseValue);
+            document.getElementById('dispWastagePercent').innerText = wastagePercent + "% of weight";
+            document.getElementById('resWastageRupees').innerText = formatInr(wastageValue);
+            document.getElementById('resMaking').innerText = formatInr(making);
+            document.getElementById('resOtherCharges').innerText = formatInr(stone + hallm
