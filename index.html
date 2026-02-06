@@ -12,6 +12,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
+            scroll-behavior: smooth;
         }
         .luxury-font {
             font-family: 'Playfair Display', serif;
@@ -28,11 +29,11 @@
             .max-w-4xl { max-width: 100% !important; border: none; box-shadow: none; }
             .p-4, .p-8 { padding: 0 !important; }
         }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in;
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -45,7 +46,7 @@
             <p class="text-amber-200 text-sm mt-1 uppercase tracking-widest">Premium Jewelry Billing Portal</p>
         </div>
 
-        <form id="billingForm" class="p-6 space-y-8 no-print">
+        <form id="billingForm" class="p-6 space-y-8 no-print" onsubmit="return false;">
             <!-- Section 1: Customer Info -->
             <div>
                 <h2 class="text-lg font-semibold text-amber-900 border-b border-amber-100 pb-2 mb-4">
@@ -127,18 +128,18 @@
                     </h2>
                     <div class="inline-flex rounded-md shadow-sm" role="group">
                         <button type="button" id="oldGoldYes" onclick="toggleOldGold(true)" class="px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-l-lg hover:bg-amber-100">Yes</button>
-                        <button type="button" id="oldGoldNo" onclick="toggleOldGold(false)" class="px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg hover:bg-amber-800">No</button>
+                        <button type="button" id="oldGoldNo" onclick="toggleOldGold(false)" class="px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg hover:bg-amber-800 shadow-sm">No</button>
                     </div>
                 </div>
 
-                <div id="oldGoldSection" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
+                <div id="oldGoldSection" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-up">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Weight (g)</label>
-                        <input type="number" id="oldWeight" step="0.001" placeholder="0.000" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                        <input type="number" id="oldWeight" step="0.001" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Rate (per gram ₹)</label>
-                        <input type="number" id="oldRate" step="0.01" placeholder="0.00" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                        <input type="number" id="oldRate" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Touch/Purity (%)</label>
@@ -157,118 +158,129 @@
                     <i class="fas fa-file-invoice-dollar mr-2"></i>Generate Bill
                 </button>
                 <button type="reset" onclick="document.getElementById('billResult').classList.add('hidden')" class="px-6 py-4 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50">
-                    Reset
+                    Clear Form
                 </button>
             </div>
         </form>
 
-        <!-- Bill Result Modal -->
-        <div id="billResult" class="hidden p-6 border-t border-gray-100 bg-gray-50">
+        <!-- Bill Result Section -->
+        <div id="billResult" class="hidden p-6 border-t border-gray-100 bg-gray-50 animate-slide-up">
             <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-300" id="printArea">
                 <div class="text-center mb-8">
-                    <h1 class="luxury-font text-3xl text-amber-900">GLEAM & GOLD ARTISANS</h1>
-                    <p class="text-xs uppercase tracking-widest text-gray-500">Fine Jewelry & Craftsmanship</p>
-                    <div class="h-1 w-20 bg-amber-600 mx-auto mt-2"></div>
+                    <h1 class="luxury-font text-3xl text-amber-900 uppercase">GLEAM & GOLD ARTISANS</h1>
+                    <p class="text-xs uppercase tracking-widest text-gray-500 mt-1">Premium Quality Since 1995</p>
+                    <div class="h-1 w-20 bg-amber-600 mx-auto mt-3"></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-8 mb-8 text-sm">
                     <div>
-                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Customer Details</h4>
+                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Customer Info</h4>
                         <p class="text-lg font-semibold text-gray-800" id="dispCustName"></p>
                         <p class="text-gray-600" id="dispCustContact"></p>
                     </div>
                     <div class="text-right">
-                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Invoice Info</h4>
+                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Billing Details</h4>
                         <p class="text-gray-800 font-medium" id="dispDate"></p>
-                        <p class="text-gray-500">Invoice No: #INV-2025</p>
+                        <p class="text-gray-500">Bill No: GG-2025-001</p>
                     </div>
                 </div>
 
                 <table class="w-full mb-8">
                     <thead>
                         <tr class="border-b-2 border-amber-900 text-left text-xs uppercase text-amber-900">
-                            <th class="py-2">Description</th>
-                            <th class="py-2 text-right">Details</th>
+                            <th class="py-2">Item Description</th>
+                            <th class="py-2 text-right">Qty/Details</th>
                             <th class="py-2 text-right">Amount (₹)</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm">
+                        <!-- Main Gold Item -->
                         <tr class="border-b">
-                            <td class="py-3">
-                                <p class="font-bold" id="dispItem"></p>
+                            <td class="py-4">
+                                <p class="font-bold text-gray-800" id="dispItem"></p>
                                 <p class="text-xs text-gray-500" id="dispPurity"></p>
                             </td>
-                            <td class="py-3 text-right">
+                            <td class="py-4 text-right">
                                 <span id="dispWeight"></span>g @ <span id="dispRate"></span>/g
                             </td>
-                            <td class="py-3 text-right" id="resGoldBase"></td>
+                            <td class="py-4 text-right font-medium" id="resGoldBase"></td>
                         </tr>
-                        <tr class="border-b text-gray-600">
-                            <td class="py-2">Wastage Charges</td>
-                            <td class="py-2 text-right" id="dispWastagePercent"></td>
-                            <td class="py-2 text-right font-medium" id="resWastageRupees"></td>
+                        <!-- Charges Breakdown -->
+                        <tr class="text-gray-600 border-b">
+                            <td class="py-2">Wastage Charges (<span id="dispWastagePct"></span>%)</td>
+                            <td class="py-2 text-right">Calculated</td>
+                            <td class="py-2 text-right" id="resWastageRupees"></td>
                         </tr>
-                        <tr class="border-b text-gray-600">
+                        <tr class="text-gray-600 border-b">
                             <td class="py-2">Making Charges</td>
                             <td class="py-2 text-right">Service</td>
                             <td class="py-2 text-right" id="resMaking"></td>
                         </tr>
-                        <tr class="border-b text-gray-600">
-                            <td class="py-2">Stone & Hallmark Charges</td>
-                            <td class="py-2 text-right">Add-ons</td>
-                            <td class="py-2 text-right" id="resOtherCharges"></td>
+                        <tr class="text-gray-600 border-b">
+                            <td class="py-2">Stone Charges</td>
+                            <td class="py-2 text-right">Additional</td>
+                            <td class="py-2 text-right" id="resStone"></td>
                         </tr>
-                        <tr id="oldGoldRow" class="border-b text-red-600 font-medium hidden">
+                        <tr class="text-gray-600 border-b">
+                            <td class="py-2">Hallmark Charges</td>
+                            <td class="py-2 text-right">BIS 916</td>
+                            <td class="py-2 text-right" id="resHallmark"></td>
+                        </tr>
+                        <!-- Deductions -->
+                        <tr id="oldGoldRow" class="text-red-600 border-b hidden font-medium">
                             <td class="py-3 italic">Old Gold Exchange Deduction</td>
                             <td class="py-3 text-right text-xs" id="dispOldDetails"></td>
                             <td class="py-3 text-right" id="resOldDeduction"></td>
                         </tr>
                         <tr class="text-blue-600 font-medium">
-                            <td class="py-3">Advance Paid</td>
-                            <td class="py-3 text-right">Deduction</td>
+                            <td class="py-3">Advance Received</td>
+                            <td class="py-3 text-right">Payment</td>
                             <td class="py-3 text-right" id="resAdvance"></td>
                         </tr>
                     </tbody>
                 </table>
 
-                <div class="flex justify-end">
+                <div class="flex flex-col items-end">
                     <div class="w-full md:w-1/2 space-y-2">
                         <div class="flex justify-between text-gray-500">
-                            <span>Sub Total</span>
+                            <span>Sub Total (Before Deductions)</span>
                             <span id="resSubTotal"></span>
                         </div>
-                        <div class="flex justify-between text-xl font-bold text-amber-900 border-t pt-2">
-                            <span>Grand Total</span>
+                        <div class="flex justify-between text-xl font-bold text-amber-900 border-t-2 border-amber-900 pt-3">
+                            <span>Final Balance Payable</span>
                             <span id="resFinalTotal"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-12 text-center text-[10px] text-gray-400 uppercase tracking-widest no-print">
-                    <p>Thank you for choosing Gleam & Gold Artisans</p>
-                    <button onclick="window.print()" class="mt-4 bg-amber-900 text-white px-10 py-3 rounded-xl hover:bg-black transition flex items-center mx-auto">
-                        <i class="fas fa-print mr-2"></i>Download / Print Invoice
-                    </button>
-                </div>
-                
-                <div class="mt-12 text-center text-[10px] text-gray-400 hidden print-only">
-                    <p>Computer generated invoice. No signature required.</p>
+                <div class="mt-12 text-center no-print">
+                    <p class="text-gray-400 text-xs uppercase mb-4 tracking-widest">Certified Authenticity Guaranteed</p>
+                    <div class="flex gap-4 justify-center">
+                        <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-xl hover:bg-black transition flex items-center">
+                            <i class="fas fa-print mr-2"></i>Print/Save Bill
+                        </button>
+                        <button onclick="document.getElementById('billResult').classList.add('hidden')" class="bg-gray-100 text-gray-600 px-8 py-3 rounded-xl hover:bg-gray-200 transition">
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Set default date
         document.getElementById('billDate').valueAsDate = new Date();
-        let hasOldGold = false;
+        
+        let hasOldGoldExchange = false;
 
-        function toggleOldGold(value) {
-            hasOldGold = value;
+        function toggleOldGold(status) {
+            hasOldGoldExchange = status;
             const section = document.getElementById('oldGoldSection');
             const yesBtn = document.getElementById('oldGoldYes');
             const noBtn = document.getElementById('oldGoldNo');
 
-            if (value) {
+            if (status) {
                 section.classList.remove('hidden');
                 yesBtn.className = "px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-l-lg";
                 noBtn.className = "px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-r-lg hover:bg-amber-100";
@@ -279,60 +291,51 @@
             }
         }
 
-        function formatInr(val) {
-            return "₹" + parseFloat(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        function formatCurrency(num) {
+            return "₹" + parseFloat(num).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         function calculateBill() {
             const form = document.getElementById('billingForm');
+            
+            // Check if all required fields are filled
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
 
-            // Inputs
-            const weight = parseFloat(document.getElementById('weight').value);
-            const rate = parseFloat(document.getElementById('rate').value);
-            const wastagePercent = parseFloat(document.getElementById('wastage').value);
+            // --- INPUTS ---
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+            const wastagePct = parseFloat(document.getElementById('wastage').value) || 0;
             const making = parseFloat(document.getElementById('makingCharge').value) || 0;
             const stone = parseFloat(document.getElementById('stoneCharge').value) || 0;
             const hallmark = parseFloat(document.getElementById('hallmarkCharge').value) || 0;
             const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
 
-            // New Gold Logic
-            const goldBaseValue = weight * rate;
-            const wastageValue = goldBaseValue * (wastagePercent / 100);
-            const subTotal = goldBaseValue + wastageValue + making + stone + hallmark;
+            // --- CALCULATIONS ---
+            const baseGoldValue = weight * rate;
+            const wastageRupees = baseGoldValue * (wastagePct / 100);
+            const subTotal = baseGoldValue + wastageRupees + making + stone + hallmark;
 
-            // Old Gold Logic
-            let oldDeduction = 0;
-            if (hasOldGold) {
-                const oldW = parseFloat(document.getElementById('oldWeight').value) || 0;
-                const oldR = parseFloat(document.getElementById('oldRate').value) || 0;
-                const oldT = parseFloat(document.getElementById('oldPurity').value) / 100 || 1;
-                const oldWas = parseFloat(document.getElementById('oldWastage').value) || 0;
+            let oldGoldDeduction = 0;
+            if (hasOldGoldExchange) {
+                const ow = parseFloat(document.getElementById('oldWeight').value) || 0;
+                const or = parseFloat(document.getElementById('oldRate').value) || 0;
+                const op = parseFloat(document.getElementById('oldPurity').value) / 100 || 1;
+                const owas = parseFloat(document.getElementById('oldWastage').value) || 0;
                 
-                oldDeduction = (oldW - oldWas) * oldR * oldT;
+                oldGoldDeduction = (ow - owas) * or * op;
+                
                 document.getElementById('oldGoldRow').classList.remove('hidden');
-                document.getElementById('dispOldDetails').innerText = `${oldW}g - ${oldWas}g @ ${oldR}/g (${(oldT*100).toFixed(0)}% Touch)`;
+                document.getElementById('dispOldDetails').innerText = `${ow}g - ${owas}g @ ${or}/g (${(op*100).toFixed(1)}% Touch)`;
             } else {
                 document.getElementById('oldGoldRow').classList.add('hidden');
             }
 
-            const finalTotal = subTotal - oldDeduction - advance;
+            const finalTotal = subTotal - oldGoldDeduction - advance;
 
-            // Populate Bill
-            document.getElementById('dispDate').innerText = "Date: " + document.getElementById('billDate').value;
+            // --- POPULATE BILL ---
             document.getElementById('dispCustName').innerText = document.getElementById('custName').value;
             document.getElementById('dispCustContact').innerText = "+91 " + document.getElementById('custContact').value;
-            
-            document.getElementById('dispItem').innerText = document.getElementById('itemName').value;
-            document.getElementById('dispPurity').innerText = "Purity: " + document.getElementById('purity').value;
-            document.getElementById('dispWeight').innerText = weight.toFixed(3);
-            document.getElementById('dispRate').innerText = rate.toFixed(2);
-            
-            document.getElementById('resGoldBase').innerText = formatInr(goldBaseValue);
-            document.getElementById('dispWastagePercent').innerText = wastagePercent + "% of weight";
-            document.getElementById('resWastageRupees').innerText = formatInr(wastageValue);
-            document.getElementById('resMaking').innerText = formatInr(making);
-            document.getElementById('resOtherCharges').innerText = formatInr(stone + hallm
+            document.getElementById('dispDate').innerText = "Date: " + docume
