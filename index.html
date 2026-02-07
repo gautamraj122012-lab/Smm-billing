@@ -2,343 +2,313 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gleam & Gold - Jewelry Billing System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jewelry Mobile Bill</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
         
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            scroll-behavior: smooth;
+            font-family: 'Outfit', sans-serif;
+            background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
         }
-        .luxury-font {
-            font-family: 'Playfair Display', serif;
+        .luxury-font { font-family: 'Playfair Display', serif; }
+        
+        /* Mobile Keyboard Optimization */
+        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .form-card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
         }
-        .input-focus:focus {
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        .input-field:focus {
             outline: none;
             border-color: #b45309;
-            box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.2);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
+
         @media print {
             .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; margin: 0; padding: 0; }
-            .max-w-4xl { max-width: 100% !important; border: none; box-shadow: none; }
-        }
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            body { background: white; padding: 0; }
+            .print-area { box-shadow: none !important; border: none !important; width: 100% !important; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-amber-100">
-        <!-- Header -->
-        <div class="bg-amber-900 p-6 text-white text-center no-print">
-            <h1 class="luxury-font text-3xl md:text-4xl">Gleam & Gold Artisans</h1>
-            <p class="text-amber-200 text-sm mt-1 uppercase tracking-widest">Premium Jewelry Billing Portal</p>
-        </div>
+<body class="pb-10">
 
-        <form id="billingForm" class="p-6 space-y-8 no-print" onsubmit="event.preventDefault(); calculateBill();">
-            <!-- Section 1: Customer Info -->
-            <div>
-                <h2 class="text-lg font-semibold text-amber-900 border-b border-amber-100 pb-2 mb-4">
-                    <i class="fas fa-user-circle mr-2"></i>Customer Details
+    <!-- Header -->
+    <div class="bg-amber-900 text-white p-6 pb-10 rounded-b-[2.5rem] shadow-lg mb-[-2rem] no-print">
+        <h1 class="luxury-font text-2xl text-center">Gleam & Gold</h1>
+        <p class="text-amber-200 text-center text-xs uppercase tracking-widest opacity-80">Mobile Billing Portal</p>
+    </div>
+
+    <div class="max-w-md mx-auto px-4 no-print">
+        <form id="billingForm" onsubmit="event.preventDefault(); generateBill();" class="space-y-4">
+            
+            <!-- Customer Section -->
+            <div class="form-card p-5 mt-4">
+                <h2 class="text-amber-900 font-bold mb-4 flex items-center">
+                    <i class="fas fa-user-circle mr-2"></i> Customer Info
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Date</label>
-                        <input type="date" id="billDate" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
+                <div class="space-y-3">
+                    <input type="date" id="billDate" required class="input-field">
+                    <input type="text" id="custName" placeholder="Customer Name" required class="input-field">
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-100 text-gray-500 text-sm">+91</span>
+                        <input type="tel" id="custContact" pattern="[0-9]{10}" inputmode="tel" placeholder="Mobile Number" required class="input-field rounded-l-none">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-                        <input type="text" id="custName" placeholder="Full Name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Contact Number</label>
-                        <div class="flex mt-1">
-                            <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">+91</span>
-                            <input type="tel" id="custContact" pattern="[0-9]{10}" placeholder="9876543210" required class="w-full p-2 border border-gray-300 rounded-r-lg input-focus">
+                </div>
+            </div>
+
+            <!-- Item Section -->
+            <div class="form-card p-5">
+                <h2 class="text-amber-900 font-bold mb-4 flex items-center">
+                    <i class="fas fa-gem mr-2"></i> Purchase Details
+                </h2>
+                <div class="space-y-3">
+                    <input type="text" id="itemName" placeholder="Item (e.g. Ring, Chain)" required class="input-field">
+                    <select id="purity" class="input-field">
+                        <option value="22K (91.6%)">22K (91.6%)</option>
+                        <option value="24K (99.9%)">24K (99.9%)</option>
+                        <option value="18K (75%)">18K (75%)</option>
+                    </select>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Weight (g)</label>
+                            <input type="number" id="weight" step="0.001" inputmode="decimal" placeholder="0.000" required class="input-field">
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Rate (₹/g)</label>
+                            <input type="number" id="rate" step="0.01" inputmode="decimal" placeholder="0.00" required class="input-field">
                         </div>
                     </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Wastage (%)</label>
+                            <input type="number" id="wastage" step="0.1" inputmode="decimal" value="0" class="input-field">
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase text-gray-400 font-bold ml-1">Making (₹)</label>
+                            <input type="number" id="making" step="1" inputmode="numeric" value="0" class="input-field">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="number" id="stone" inputmode="numeric" placeholder="Stone ₹" value="0" class="input-field">
+                        <input type="number" id="hallmark" inputmode="numeric" placeholder="Hallmark ₹" value="0" class="input-field">
+                    </div>
+                    <input type="number" id="advance" inputmode="numeric" placeholder="Advance Paid ₹" value="0" class="input-field border-blue-200">
                 </div>
             </div>
 
-            <!-- Section 2: New Gold Details -->
-            <div>
-                <h2 class="text-lg font-semibold text-amber-900 border-b border-amber-100 pb-2 mb-4">
-                    <i class="fas fa-gem mr-2"></i>New Purchase Details
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Item Name</label>
-                        <input type="text" id="itemName" placeholder="Gold Necklace" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Purity (Karat)</label>
-                        <select id="purity" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                            <option value="24K (99.9%)">24K (99.9%)</option>
-                            <option value="22K (91.6%)" selected>22K (91.6%)</option>
-                            <option value="18K (75%)">18K (75%)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Weight (grams)</label>
-                        <input type="number" id="weight" step="0.001" placeholder="0.000" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Rate (per gram ₹)</label>
-                        <input type="number" id="rate" step="0.01" placeholder="0.00" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Wastage (%)</label>
-                        <input type="number" id="wastage" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Making Charge (₹)</label>
-                        <input type="number" id="makingCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Stone Charge (₹)</label>
-                        <input type="number" id="stoneCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Hallmark Charge (₹)</label>
-                        <input type="number" id="hallmarkCharge" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Advance Paid (₹)</label>
-                        <input type="number" id="advancePaid" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 3: Old Gold Exchange -->
-            <div class="bg-amber-50 p-6 rounded-xl border border-amber-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-amber-900">
-                        <i class="fas fa-exchange-alt mr-2"></i>Old Gold Exchange?
+            <!-- Old Gold Section -->
+            <div class="form-card p-5 bg-amber-50">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-amber-900 font-bold flex items-center">
+                        <i class="fas fa-history mr-2"></i> Old Gold?
                     </h2>
-                    <div class="inline-flex rounded-md shadow-sm" role="group">
-                        <button type="button" id="oldGoldYes" onclick="toggleOldGold(true)" class="px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-l-lg hover:bg-amber-100">Yes</button>
-                        <button type="button" id="oldGoldNo" onclick="toggleOldGold(false)" class="px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg hover:bg-amber-800 shadow-sm">No</button>
+                    <div class="flex bg-white rounded-lg p-1 shadow-sm border border-amber-200">
+                        <button type="button" onclick="setOldGold(true)" id="ogYes" class="px-4 py-1 rounded-md text-sm transition">Yes</button>
+                        <button type="button" onclick="setOldGold(false)" id="ogNo" class="px-4 py-1 rounded-md text-sm bg-amber-900 text-white transition">No</button>
                     </div>
                 </div>
-
-                <div id="oldGoldSection" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-up">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Weight (g)</label>
-                        <input type="number" id="oldWeight" step="0.001" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                <div id="oldGoldInputs" class="hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="number" id="oldW" step="0.001" inputmode="decimal" placeholder="Weight (g)" class="input-field bg-white">
+                        <input type="number" id="oldR" step="0.01" inputmode="decimal" placeholder="Rate (₹)" class="input-field bg-white">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Rate (per gram ₹)</label>
-                        <input type="number" id="oldRate" step="0.01" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Touch/Purity (%)</label>
-                        <input type="number" id="oldPurity" step="0.01" value="100" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Wastage (g)</label>
-                        <input type="number" id="oldWastage" step="0.001" value="0" class="mt-1 w-full p-2 border border-gray-300 rounded-lg input-focus bg-white">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="number" id="oldP" step="1" inputmode="numeric" placeholder="Touch %" class="input-field bg-white">
+                        <input type="number" id="oldWas" step="0.001" inputmode="decimal" placeholder="Wastage (g)" class="input-field bg-white">
                     </div>
                 </div>
             </div>
 
-            <!-- Error Message Box -->
-            <div id="errorMessage" class="hidden p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-                Please fill in all required fields marked with * before generating the bill.
-            </div>
-
-            <!-- Actions -->
-            <div class="flex flex-col md:flex-row gap-4 pt-4">
-                <button type="submit" class="flex-1 bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 transition shadow-lg text-lg">
-                    <i class="fas fa-file-invoice-dollar mr-2"></i>Generate Bill
-                </button>
-                <button type="reset" onclick="resetForm()" class="px-6 py-4 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50">
-                    Clear Form
-                </button>
-            </div>
+            <button type="submit" class="w-full bg-amber-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-transform">
+                <i class="fas fa-check-circle mr-2"></i> Generate Bill
+            </button>
         </form>
+    </div>
 
-        <!-- Bill Result Section -->
-        <div id="billResult" class="hidden p-6 border-t border-gray-100 bg-gray-50 animate-slide-up">
-            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-300" id="printArea">
-                <div class="text-center mb-8">
-                    <h1 class="luxury-font text-3xl text-amber-900 uppercase">GLEAM & GOLD ARTISANS</h1>
-                    <p class="text-xs uppercase tracking-widest text-gray-500 mt-1">Fine Jewelry & Certified Excellence</p>
-                    <div class="h-1 w-20 bg-amber-600 mx-auto mt-3"></div>
+    <!-- Bill View -->
+    <div id="billResult" class="hidden p-4 mt-6">
+        <div id="printArea" class="bg-white rounded-2xl shadow-2xl p-6 border border-gray-200">
+            <div class="text-center mb-6">
+                <h1 class="luxury-font text-2xl text-amber-900">GLEAM & GOLD</h1>
+                <p class="text-[10px] tracking-widest text-gray-400">AUTHENTIC JEWELRY INVOICE</p>
+                <div class="h-0.5 w-12 bg-amber-600 mx-auto mt-2"></div>
+            </div>
+
+            <div class="flex justify-between text-[11px] mb-6 text-gray-600 leading-tight">
+                <div>
+                    <p class="font-bold text-gray-900" id="resName"></p>
+                    <p id="resContact"></p>
                 </div>
-
-                <div class="grid grid-cols-2 gap-8 mb-8 text-sm">
-                    <div>
-                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Customer Info</h4>
-                        <p class="text-lg font-semibold text-gray-800" id="dispCustName"></p>
-                        <p class="text-gray-600" id="dispCustContact"></p>
-                    </div>
-                    <div class="text-right">
-                        <h4 class="font-bold text-gray-400 uppercase text-xs mb-1">Billing Details</h4>
-                        <p class="text-gray-800 font-medium" id="dispDate"></p>
-                        <p class="text-gray-500" id="dispInvoiceNo"></p>
-                    </div>
+                <div class="text-right">
+                    <p id="resDate"></p>
+                    <p id="resInv">INV-9823</p>
                 </div>
+            </div>
 
-                <table class="w-full mb-8">
-                    <thead>
-                        <tr class="border-b-2 border-amber-900 text-left text-xs uppercase text-amber-900">
-                            <th class="py-2">Item Description</th>
-                            <th class="py-2 text-right">Qty/Details</th>
-                            <th class="py-2 text-right">Amount (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <!-- Main Gold Item -->
-                        <tr class="border-b">
-                            <td class="py-4">
-                                <p class="font-bold text-gray-800" id="dispItem"></p>
-                                <p class="text-xs text-gray-500" id="dispPurity"></p>
-                            </td>
-                            <td class="py-4 text-right">
-                                <span id="dispWeight"></span>g @ <span id="dispRate"></span>/g
-                            </td>
-                            <td class="py-4 text-right font-medium" id="resGoldBase"></td>
-                        </tr>
-                        <!-- Charges -->
-                        <tr class="text-gray-600 border-b">
-                            <td class="py-2">Wastage Charges (<span id="dispWastagePct"></span>%)</td>
-                            <td class="py-2 text-right">Service</td>
-                            <td class="py-2 text-right" id="resWastageRupees"></td>
-                        </tr>
-                        <tr class="text-gray-600 border-b">
-                            <td class="py-2">Making Charges</td>
-                            <td class="py-2 text-right">Craftsmanship</td>
-                            <td class="py-2 text-right" id="resMaking"></td>
-                        </tr>
-                        <tr class="text-gray-600 border-b">
-                            <td class="py-2">Stone Charges</td>
-                            <td class="py-2 text-right">Embellishments</td>
-                            <td class="py-2 text-right" id="resStone"></td>
-                        </tr>
-                        <tr class="text-gray-600 border-b">
-                            <td class="py-2">Hallmark Charges</td>
-                            <td class="py-2 text-right">BIS Certification</td>
-                            <td class="py-2 text-right" id="resHallmark"></td>
-                        </tr>
-                        <!-- Deductions -->
-                        <tr id="oldGoldRow" class="text-red-600 border-b hidden font-medium">
-                            <td class="py-3 italic">Old Gold Exchange Deduction</td>
-                            <td class="py-3 text-right text-xs leading-tight" id="dispOldDetails"></td>
-                            <td class="py-3 text-right" id="resOldDeduction"></td>
-                        </tr>
-                        <tr class="text-blue-600 font-medium">
-                            <td class="py-3">Advance Received</td>
-                            <td class="py-3 text-right">Deposit</td>
-                            <td class="py-3 text-right" id="resAdvance"></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <table class="w-full text-xs mb-6">
+                <tr class="border-b border-gray-100 text-gray-400">
+                    <th class="text-left py-2 font-normal">Description</th>
+                    <th class="text-right py-2 font-normal">Amount</th>
+                </tr>
+                <tr class="border-b border-gray-50">
+                    <td class="py-3">
+                        <p class="font-bold text-gray-800" id="resItem"></p>
+                        <p class="text-[10px]" id="resSubDetails"></p>
+                    </td>
+                    <td class="text-right font-bold" id="resBase"></td>
+                </tr>
+                <tr class="text-gray-500">
+                    <td class="pt-2">Wastage Charges (<span id="resWasPct"></span>%)</td>
+                    <td class="text-right pt-2" id="resWasVal"></td>
+                </tr>
+                <tr class="text-gray-500">
+                    <td>Making Charges</td>
+                    <td class="text-right" id="resMakVal"></td>
+                </tr>
+                <tr class="text-gray-500 border-b border-gray-50">
+                    <td class="pb-2">Stone & Hallmark</td>
+                    <td class="text-right pb-2" id="resOtherVal"></td>
+                </tr>
+                <tr id="oldGoldRow" class="text-red-500 hidden bg-red-50">
+                    <td class="py-2 px-1">Old Gold Exchange</td>
+                    <td class="text-right py-2 px-1" id="resOldVal"></td>
+                </tr>
+                <tr class="text-blue-600">
+                    <td class="py-2">Advance Received</td>
+                    <td class="text-right py-2" id="resAdvVal"></td>
+                </tr>
+            </table>
 
-                <div class="flex flex-col items-end">
-                    <div class="w-full md:w-1/2 space-y-2">
-                        <div class="flex justify-between text-gray-500">
-                            <span>Total Gross Amount</span>
-                            <span id="resSubTotal"></span>
-                        </div>
-                        <div class="flex justify-between text-xl font-bold text-amber-900 border-t-2 border-amber-900 pt-3">
-                            <span>Balance Payable</span>
-                            <span id="resFinalTotal"></span>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-amber-900 text-white p-4 rounded-xl flex justify-between items-center">
+                <span class="text-sm">Payable Amount</span>
+                <span class="text-xl font-bold" id="resGrand"></span>
+            </div>
 
-                <div class="mt-12 text-center no-print border-t pt-8">
-                    <div class="flex flex-wrap gap-4 justify-center">
-                        <button onclick="downloadPDF()" class="bg-amber-600 text-white px-8 py-3 rounded-xl hover:bg-amber-700 transition flex items-center shadow-lg">
-                            <i class="fas fa-file-pdf mr-2"></i>Download PDF
-                        </button>
-                        <button onclick="window.print()" class="bg-gray-800 text-white px-8 py-3 rounded-xl hover:bg-black transition flex items-center shadow-lg">
-                            <i class="fas fa-print mr-2"></i>Print Bill
-                        </button>
-                        <button onclick="document.getElementById('billResult').classList.add('hidden')" class="bg-gray-100 text-gray-600 px-8 py-3 rounded-xl hover:bg-gray-200 transition">
-                            Close
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-12 text-center text-[10px] text-gray-400 hidden print-only">
-                    <p>Computer Generated Invoice. Valid without signature.</p>
-                </div>
+            <div class="mt-8 no-print space-y-3">
+                <button onclick="downloadPDF()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+                    <i class="fas fa-file-pdf mr-2"></i> Download PDF
+                </button>
+                <button onclick="shareWhatsApp()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold">
+                    <i class="fab fa-whatsapp mr-2"></i> Share on WhatsApp
+                </button>
+                <button onclick="location.reload()" class="w-full text-gray-400 py-2 text-sm">Create New Bill</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Set default date
         document.getElementById('billDate').valueAsDate = new Date();
-        
-        let hasOldGoldExchange = false;
+        let useOldGold = false;
 
-        function toggleOldGold(status) {
-            hasOldGoldExchange = status;
-            const section = document.getElementById('oldGoldSection');
-            const yesBtn = document.getElementById('oldGoldYes');
-            const noBtn = document.getElementById('oldGoldNo');
-
-            if (status) {
-                section.classList.remove('hidden');
-                yesBtn.className = "px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-l-lg";
-                noBtn.className = "px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-r-lg hover:bg-amber-100";
-            } else {
-                section.classList.add('hidden');
-                noBtn.className = "px-4 py-2 text-sm font-medium text-white bg-amber-900 border border-amber-900 rounded-r-lg";
-                yesBtn.className = "px-4 py-2 text-sm font-medium text-amber-900 bg-white border border-amber-200 rounded-l-lg hover:bg-amber-100";
-            }
-        }
-
-        function formatCurrency(num) {
-            return "₹" + parseFloat(num || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function resetForm() {
-            document.getElementById('billResult').classList.add('hidden');
-            document.getElementById('errorMessage').classList.add('hidden');
-        }
-
-        function calculateBill() {
-            const form = document.getElementById('billingForm');
-            const errorBox = document.getElementById('errorMessage');
+        function setOldGold(val) {
+            useOldGold = val;
+            const inputs = document.getElementById('oldGoldInputs');
+            const yes = document.getElementById('ogYes');
+            const no = document.getElementById('ogNo');
             
-            if (!form.checkValidity()) {
-                errorBox.classList.remove('hidden');
-                form.reportValidity();
-                return;
+            if(val) {
+                inputs.classList.remove('hidden');
+                yes.className = "px-4 py-1 rounded-md text-sm bg-amber-900 text-white";
+                no.className = "px-4 py-1 rounded-md text-sm text-amber-900 bg-white";
+            } else {
+                inputs.classList.add('hidden');
+                no.className = "px-4 py-1 rounded-md text-sm bg-amber-900 text-white";
+                yes.className = "px-4 py-1 rounded-md text-sm text-amber-900 bg-white";
             }
-            errorBox.classList.add('hidden');
+        }
 
-            // --- DATA EXTRACTION ---
-            const weight = parseFloat(document.getElementById('weight').value) || 0;
-            const rate = parseFloat(document.getElementById('rate').value) || 0;
-            const wastagePct = parseFloat(document.getElementById('wastage').value) || 0;
-            const making = parseFloat(document.getElementById('makingCharge').value) || 0;
-            const stone = parseFloat(document.getElementById('stoneCharge').value) || 0;
-            const hallmark = parseFloat(document.getElementById('hallmarkCharge').value) || 0;
-            const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
+        const fmt = (v) => "₹" + parseFloat(v || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
 
-            // --- NEW GOLD CALCULATIONS ---
-            const baseGoldValue = weight * rate;
-            const wastageRupees = baseGoldValue * (wastagePct / 100);
-            const subTotal = baseGoldValue + wastageRupees + making + stone + hallmark;
+        function generateBill() {
+            // Inputs
+            const w = parseFloat(document.getElementById('weight').value);
+            const r = parseFloat(document.getElementById('rate').value);
+            const wasP = parseFloat(document.getElementById('wastage').value);
+            const mak = parseFloat(document.getElementById('making').value);
+            const sto = parseFloat(document.getElementById('stone').value);
+            const hal = parseFloat(document.getElementById('hallmark').value);
+            const adv = parseFloat(document.getElementById('advance').value);
 
-            // --- OLD GOLD CALCULATIONS ---
-            let oldGoldDeduction = 0;
-            if (hasOldGoldExchange) {
-                const ow = parseFloat(document.getElementById('oldWeight').value) || 0;
-        
+            // Calcs
+            const base = w * r;
+            const wastageInRs = base * (wasP / 100);
+            const total = base + wastageInRs + mak + sto + hal;
+
+            let oldDed = 0;
+            if(useOldGold) {
+                const ow = parseFloat(document.getElementById('oldW').value) || 0;
+                const or = parseFloat(document.getElementById('oldR').value) || 0;
+                const op = (parseFloat(document.getElementById('oldP').value) || 100) / 100;
+                const owas = parseFloat(document.getElementById('oldWas').value) || 0;
+                oldDed = (ow - owas) * or * op;
+                document.getElementById('oldGoldRow').classList.remove('hidden');
+            } else {
+                document.getElementById('oldGoldRow').classList.add('hidden');
+            }
+
+            const final = total - oldDed - adv;
+
+            // UI
+            document.getElementById('resName').innerText = document.getElementById('custName').value;
+            document.getElementById('resContact').innerText = "+91 " + document.getElementById('custContact').value;
+            document.getElementById('resDate').innerText = document.getElementById('billDate').value;
+            document.getElementById('resItem').innerText = document.getElementById('itemName').value;
+            document.getElementById('resSubDetails').innerText = `${w}g @ ${r}/g | ${document.getElementById('purity').value}`;
+            
+            document.getElementById('resBase').innerText = fmt(base);
+            document.getElementById('resWasPct').innerText = wasP;
+            document.getElementById('resWasVal').innerText = fmt(wastageInRs);
+            document.getElementById('resMakVal').innerText = fmt(mak);
+            document.getElementById('resOtherVal').innerText = fmt(sto + hal);
+            document.getElementById('resOldVal').innerText = "-" + fmt(oldDed);
+            document.getElementById('resAdvVal').innerText = "-" + fmt(adv);
+            document.getElementById('resGrand').innerText = fmt(Math.max(0, final));
+
+            document.getElementById('billResult').classList.remove('hidden');
+            document.getElementById('billResult').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('printArea');
+            const opt = {
+                margin: 5,
+                filename: `Bill_${document.getElementById('custName').value}.pdf`,
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function shareWhatsApp() {
+            const name = document.getElementById('custName').value;
+            const total = document.getElementById('resGrand').innerText;
+            const phone = "91" + document.getElementById('custContact').value;
+            const msg = `*GLEAM & GOLD INVOICE*%0A%0AHi ${name},%0AYour bill for ${document.getElementById('itemName').value} is generated.%0A%0A*Total Amount:* ${total}%0A%0AThank you for shopping with us!`;
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+    </script>
+</body>
+</html>
+
